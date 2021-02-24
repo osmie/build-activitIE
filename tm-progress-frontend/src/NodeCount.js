@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useFetch } from "./hooks";
-import styled from "styled-components";
-import { parseJSON, formatDistance } from "date-fns";
+
+
 import {
   VictoryLine,
   VictoryChart,
@@ -11,8 +11,9 @@ import {
   VictoryTooltip
 } from "victory";
 
-function NodeCount() {
-  const url = `https://tasks.openstreetmap.ie/tracker_api/daily_stats?startDate=2021-02-01`;
+const NodeCount = props => {
+  const {startDate} = props
+  const url = `https://tasks.openstreetmap.ie/tracker_api/daily_stats?startDate=${startDate || '2021-02-01'}`;
   const { status, data, error } = useFetch(url);
 
   return (
