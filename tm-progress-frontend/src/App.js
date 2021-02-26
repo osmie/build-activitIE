@@ -6,9 +6,12 @@ import Home from "./routes/Home";
 import { Trends } from "./routes/Trends";
 import { Header } from "./Header";
 
+import GlobalStyles from './styles/global';
+
 function App() {
   return (
     <Router>
+      <GlobalStyles />
       <div className="App">
         <Header />
         <Switch>

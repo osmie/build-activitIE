@@ -1,9 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 
+import useWindowSize from './utils/useWindowSize'
 // Routing
 import { Link, NavLink } from "react-router-dom";
 import media from "./utils/media-queries";
+import { FiMenu } from 'react-icons/fi';
 
 const filterComponentProps = (Comp, filterProps = []) => {
   const isValidProp = p => !filterProps.includes(p);
@@ -134,6 +136,8 @@ const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
 const NavLinkFilter = filterComponentProps(NavLink, propsToFilter);
 
 export const Header = () => {
+  const { width, isMobile } = useWindowSize();
+
   return (
     <PageHead>
       <PageHeadInner>
@@ -146,27 +150,43 @@ export const Header = () => {
           </Link>
         </PageTitle>
         <PageNav>
-          <GlobalMenu>
+        <GlobalMenu>
+        {isMobile ? (
+          <li>
+            <GlobalMenuLink
+              as='a'
+              
+              title='View menu'
+              onClick={() =>
+                console.log('Menu opened')  
+              }
+            ><FiMenu /></GlobalMenuLink>
+          </li>
+        ) : (
+          <>
+          
             <li>
               <GlobalMenuLink as={NavLinkFilter} to="/trends" title="Go to longterm trends" >
                 <span>Trends</span>
               </GlobalMenuLink>
+          
             </li>
-          </GlobalMenu>
-          <GlobalMenu>
             <li>
+          
               <GlobalMenuLink as={`a`} href="https://www.openstreetmap.ie/" title="OSM Ireland Website">
                 <span>OSM Ireland</span>
               </GlobalMenuLink>
+          
             </li>
-          </GlobalMenu>
-          <GlobalMenu>
             <li>
+          
               <GlobalMenuLink as={`a`} href="https://tasks.openstreetmap.ie/" title="OSM Ireland Tasking Manager">
                 <span>Tasking Manager</span>
               </GlobalMenuLink>
             </li>
-          </GlobalMenu>
+            </>
+        )}
+        </GlobalMenu>
         </PageNav>
       </PageHeadInner>
     </PageHead>
