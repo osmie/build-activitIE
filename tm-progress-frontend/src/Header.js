@@ -1,11 +1,13 @@
-import React from "react";
-import styled from "styled-components";
+import React, {useState} from "react";
+import styled, {css} from "styled-components";
 
 import useWindowSize from './utils/useWindowSize'
 // Routing
 import { Link, NavLink } from "react-router-dom";
 import media from "./utils/media-queries";
 import { FiMenu } from 'react-icons/fi';
+
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 const filterComponentProps = (Comp, filterProps = []) => {
   const isValidProp = p => !filterProps.includes(p);
@@ -16,6 +18,18 @@ const filterComponentProps = (Comp, filterProps = []) => {
     return <Comp ref={ref} {...props} />;
   });
 }
+
+const transitions = {
+  left: {
+    start: () => css`
+      transform: translate(100vw, 0);
+    `,
+    end: () => css`
+      transform: translate(0, 0);
+    `
+  }
+};
+
 
 const PageHead = styled.header`
   background: #fff;
@@ -105,6 +119,74 @@ const GlobalMenu = styled.ul`
   `}
 `;
 
+const MobileMenu = styled.ul`
+  position: absolute;
+  right: 0;
+  top: 4em;
+  background: white;
+  padding: 2.25rem;
+  z-index: 30;
+  height: 90vh;
+  width: 75vw;
+  box-shadow: -16px 0 48px -16px rgba(20, 43, 88,0.12);
+  transition: all 0.24s ease;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-end;
+  li {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    > * {
+      flex: 1;
+    }
+  }
+  a {
+    text-align: right;
+    &.active {
+      color: #0686E5};
+    }
+  }
+  h5 {
+    text-align: right;
+    text-transform: uppercase;
+    font-weight: 300;
+    color: rgba(20,43,88,0.64);
+    font-size: 0.875rem;
+    line-height: 1rem;
+    margin: 1rem;
+  }
+  &::before {
+    content: '';
+    position: fixed;
+    top: 4rem;
+    bottom: 0;
+    left: 0;
+    right: 75vw;
+    background: rgba(20, 43, 88,0.16);
+    opacity: 1;
+    z-index: -1;
+    transition: all 0.24s ease 0s;
+  }
+  & > li:nth-of-type(2) {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(20, 43, 88,0.16);
+  }
+  &.mobile-menu-enter {
+    ${transitions.left.start}
+  }
+  &.mobile-menu-enter-active {
+    ${transitions.left.end}
+  }
+  &.mobile-menu-exit {
+    ${transitions.left.end}
+  }
+  &.mobile-menu-exit-active {
+    ${transitions.left.start}
+  }
+`;
+
 const GlobalMenuLink = styled.button`
   position: relative;
   display: flex;
@@ -137,6 +219,32 @@ const NavLinkFilter = filterComponentProps(NavLink, propsToFilter);
 
 export const Header = () => {
   const { width, isMobile } = useWindowSize();
+  const [isMobileMenuOpened, setIsMobileMenuOpened] = useState(false)
+
+  const mobileMenu = () => {
+    return (<MobileMenu>
+        <li>
+              <GlobalMenuLink as={NavLinkFilter} to="/trends" title="Go to longterm trends" >
+                <span>Trends</span>
+              </GlobalMenuLink>
+          
+            </li>
+            <li>
+          
+              <GlobalMenuLink as={`a`} href="https://www.openstreetmap.ie/" title="OSM Ireland Website">
+                <span>OSM Ireland</span>
+              </GlobalMenuLink>
+          
+            </li>
+            <li>
+          
+              <GlobalMenuLink as={`a`} href="https://tasks.openstreetmap.ie/" title="OSM Ireland Tasking Manager">
+                <span>Tasking Manager</span>
+              </GlobalMenuLink>
+            </li>
+        </MobileMenu>
+        )
+  }
 
   return (
     <PageHead>
@@ -158,7 +266,9 @@ export const Header = () => {
               
               title='View menu'
               onClick={() =>
-                console.log('Menu opened')  
+                // console.log('Menu opened')
+                setIsMobileMenuOpened(currentIsMobileMenuOpened => !currentIsMobileMenuOpened)  
+
               }
             ><FiMenu /></GlobalMenuLink>
           </li>
@@ -189,6 +299,18 @@ export const Header = () => {
         </GlobalMenu>
         </PageNav>
       </PageHeadInner>
+      <TransitionGroup component={null}>
+          {isMobileMenuOpened && (
+            <CSSTransition
+              in={isMobileMenuOpened}
+              unmountOnExit={true}
+              classNames='mobile-menu'
+              timeout={300}
+            >
+              {mobileMenu()}
+            </CSSTransition>
+          )}
+        </TransitionGroup>
     </PageHead>
   );
 };
